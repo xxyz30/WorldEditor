@@ -10,3 +10,6 @@ var dimensions = [
 export function getDimension(t) {
     return dimensions[t];
 }
+export function getEvents() {
+    return world.events;
+}
