@@ -6,7 +6,7 @@
         "uuid": "423edbf4-9e80-4bf9-b1d8-a0266f695d39",
         "min_engine_version": [
             1,
-            16,
+            18,
             0
         ],
         "version": [
@@ -19,6 +19,7 @@
         {
             "type": "data",
             "uuid": "66983710-b65c-4cd7-9df3-69b3c2a220e8",
+            "description": "pack.description",
             "version": [
                 1,
                 0,
@@ -28,6 +29,7 @@
         {
             "type": "javascript",
             "uuid": "66983710-b65c-4cd7-9df3-69b3c2a220e8",
+            "description": "pack.description",
             "version": [
                 1,
                 0,
@@ -37,11 +39,13 @@
         }
     ],
 	"dependencies": [
-		{
-			"uuid": "b26a4d4c-afdf-4690-88f8-931846312678"
-		},
-		{
-			"uuid": "6f4b6893-1bb6-42fd-b458-7fa3d0c89616"
-		}
+        {
+          "uuid": "b26a4d4c-afdf-4690-88f8-931846312678",
+          "version": [ 0, 1, 0 ]
+        },
+        {
+          "uuid": "6f4b6893-1bb6-42fd-b458-7fa3d0c89616",
+          "version": [ 0, 1, 0 ]
+        }
 	]
 }
