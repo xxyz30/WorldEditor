@@ -9,6 +9,30 @@ export function registerCommand(core: WorldEditorCore) {
             running: function (e: CommandResponse) {
                 core.doSet(e.args[0], e.args[1], e.player)
             }
+        },
+        {
+            command: 'copy',
+            running: function (e: CommandResponse) {
+                core.copy()
+            }
+        },
+        {
+            command: 'paste',
+            running: function (e: CommandResponse) {
+                core.paste(e.player)
+            }
+        },
+        {
+            command: 'redo',
+            running: function (e: CommandResponse){
+                core.redo()
+            }
+        },
+        {
+            command: 'undo',
+            running: function (e: CommandResponse){
+                core.undo()
+            }
         }
     ]
     commands.forEach(e => {

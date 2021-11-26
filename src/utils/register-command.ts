@@ -1,7 +1,7 @@
 import 'mojang-minecraft';
 import { Player } from 'mojang-minecraft';
 import './utils.js'
-import { factory } from './utils.js';
+import { Factory } from './utils.js';
 
 export class RegisterCommand {
     /**
@@ -11,8 +11,8 @@ export class RegisterCommand {
 
     public static register(params: string, callBack: (data: CommandResponse) => any) {
 
-        factory.getEvents().beforeChat.subscribe(e => {
-            if (!e.message.startsWith(this.startChar)) return
+        Factory.getEvents().beforeChat.subscribe(e => {
+            if (!e.message.startsWith(this.startChar + params)) return
             e.cancel = true
             let args: string[] = e.message.split(' ').slice(1)
             callBack(new CommandResponse(e.sender, args))

@@ -1,14 +1,21 @@
-import * as mc from 'mojang-minecraft';
+import * as utils from '../utils/utils.js';
 /**
  * redo/undo operation
+ * 他们都是按引用传递的方块，不能存储Block对象，否则它变掉了，其它也得变
+ * 必须存储的是方块置换的拷贝
  */
 export class Operation {
+    constructor(dimension) {
+        this.history = [];
+        this.future = [];
+        this.dimension = dimension;
+    }
     /**
      * redo
      */
     redo() {
-        this.feture.forEach((block) => {
-            let b = this.dimension.getBlock(new mc.BlockLocation(block.x, block.y, block.z));
+        this.future.forEach((block) => {
+            let b = this.dimension.getBlock(block.location);
             b.setPermutation(block.permutation);
         });
         return true;
@@ -17,8 +24,10 @@ export class Operation {
      * undo
      */
     undo() {
-        this.history.forEach((block) => {
-            let b = this.dimension.getBlock(new mc.BlockLocation(block.x, block.y, block.z));
+        utils.tellrawText("运行重做");
+        this.history.forEach(block => {
+            utils.tellrawText(block.id);
+            let b = this.dimension.getBlock(block.location);
             b.setPermutation(block.permutation);
         });
         return true;

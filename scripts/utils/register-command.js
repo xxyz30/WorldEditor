@@ -1,10 +1,10 @@
 import 'mojang-minecraft';
 import './utils.js';
-import { factory } from './utils.js';
+import { Factory } from './utils.js';
 export class RegisterCommand {
     static register(params, callBack) {
-        factory.getEvents().beforeChat.subscribe(e => {
-            if (!e.message.startsWith(this.startChar))
+        Factory.getEvents().beforeChat.subscribe(e => {
+            if (!e.message.startsWith(this.startChar + params))
                 return;
             e.cancel = true;
             let args = e.message.split(' ').slice(1);
