@@ -21,7 +21,7 @@
             "request": "attach",
             "name": "mc",
             "mode": "listen",
-            "localRoot": "${workspaceFolder}/",
+            "localRoot": "${workspaceFolder}/src/BP/",
             "host": "localhost",
             "port": 19144
         }

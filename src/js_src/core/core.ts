@@ -133,6 +133,7 @@ export class WorldEditorCore {
                     //将修改的方块压进去
                     op.future.push(new BlockData(this.dimension.getBlock(i)))
                 } catch (ex) {
+                    if (ex.statusCode == -2147483648) throw ex
                     err++
                 }
             });
