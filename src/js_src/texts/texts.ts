@@ -18,5 +18,7 @@ export let tipText = {
     mod_switch_state_open: "world_editor.switch_state.open",
     mod_switch_state_close: "world_editor.switch_state.close",
     copy_success: "copy.success",
-    paste_success: "paste.success"
+    paste_success: "paste.success",
+    replace_fail: "replace.fail",
+    replace_success: "replace.success"
 }

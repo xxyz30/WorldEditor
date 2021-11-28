@@ -9,7 +9,7 @@ export class RegisterCommand {
      */
     public static startChar: string = '.'
 
-    public static register(params: string, callBack: (data: CommandResponse) => any) {
+    public static register(params: string, callBack: (data: CommandResponse) => void) {
 
         Factory.getEvents().beforeChat.subscribe(e => {
             if (!e.message.startsWith(this.startChar + params)) return

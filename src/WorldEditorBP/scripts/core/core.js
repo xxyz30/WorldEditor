@@ -17,9 +17,6 @@ export class WorldEditorCore {
         //撤销后的栈
         this.futureStack = [];
     }
-    // public constructor(dim: mc.Dimension) {
-    //     this.dimension = dim
-    // }
     /**
      * redo
      * 重做
@@ -105,6 +102,24 @@ export class WorldEditorCore {
      * replace
      */
     replace(args) {
+        if (args.args.length === 0) {
+            utils.tellrawTranslation(tipText.replace_fail);
+            utils.tellrawText("参数为0");
+            return;
+        }
+        let op = new Operation(this.dimension);
+        let replaceBlock = args.args[0];
+        let replaceData = args.args[1];
+        let replacedBlock = args.args[2];
+        let replacedData = args.args[3];
+        this.area.forEach(i => {
+            op.history.push(new BlockData(this.dimension.getBlock(i)));
+            utils.Commands.fillBlockById(this.dimension, i, replaceBlock, replaceData, replacedBlock, replacedData);
+            op.future.push(new BlockData(this.dimension.getBlock(i)));
+        });
+        utils.tellrawTranslation(tipText.replace_success);
+        this.futureStack.length = 0;
+        this.historyStack.push(op);
     }
     /**
      * clearClipboard
