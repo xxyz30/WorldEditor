@@ -17,7 +17,7 @@ export class WorldEditorCore {
     //选区
     area: mc.BlockLocation[] = []
     //剪贴板
-    clipBoard: mc.Block[] = []
+    clipBoard: BlockData[] = []
     //历史记录栈
     historyStack: Operation[] = []
     //撤销后的栈
@@ -80,6 +80,7 @@ export class WorldEditorCore {
      */
     public copy(args:CommandResponse) {
         this.clipBoard = this.getAreaBlock()
+        utils.tellrawTranslation(tipText.copy_success)
     }
 
     /**
@@ -97,9 +98,9 @@ export class WorldEditorCore {
 
         this.clipBoard.forEach(i => {
             //计算本次循环的块和源点的偏移
-            let x = i.x - this.node1.x
-            let y = i.y - this.node1.y
-            let z = i.z - this.node1.z
+            let x = i.location.x - this.node1.x
+            let y = i.location.y - this.node1.y
+            let z = i.location.z - this.node1.z
             let block = args.player.dimension.getBlock(origin.offset(x, y, z))
             op.history.push(new BlockData(block))
             block.setPermutation(i.permutation)
@@ -107,6 +108,7 @@ export class WorldEditorCore {
         });
         this.historyStack.push(op)
         this.futureStack.length = 0
+        utils.tellrawTranslation(tipText.paste_success)
     }
     /**
      * replace
@@ -171,10 +173,10 @@ export class WorldEditorCore {
      * get All block in BlockLocation[]
      * @param arr array of blockLocation
      */
-    private getAreaBlock(arr: mc.BlockLocation[] = this.area): mc.Block[] {
-        let blocks: mc.Block[] = []
+    private getAreaBlock(arr: mc.BlockLocation[] = this.area): BlockData[] {
+        let blocks: BlockData[] = []
         arr.forEach(i => {
-            blocks.push(this.dimension.getBlock(i))
+            blocks.push(new BlockData(this.dimension.getBlock(i)))
         });
         return blocks
     }

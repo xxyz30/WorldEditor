@@ -16,6 +16,8 @@ redo.success=§2重做成功
 redo.fail=§4重做失败
 undo.success=§2撤销成功
 undo.fail=§4撤销失败
+copy.success=§2复制成功
+paste.success=§2粘贴成功
 
 doSet.success=成功填充了§2[%s]§r个方块
 doSet.fail=填充失败
