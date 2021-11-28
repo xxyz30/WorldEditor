@@ -14,10 +14,14 @@ export function fillBlockById(
     fillBlockName: string,
     fillData: number | string = 0,
     filledBlockName: string = 'minecraft:air',
-    filledData: number | string = 0
+    filledData: number | string = -1
 ) {
+    //检测有无namespace
+    fillBlockName = utils.Converter.namespaceFormat(fillBlockName)
+    filledBlockName = utils.Converter.namespaceFormat(filledBlockName)
     //获取目前位置的方块
     let currentBlock = dimension.getBlock(location)
+
     //若是要被填充的方块，则填充
     if(currentBlock.id === filledBlockName){
         dimension.runCommand(`setblock ${location.x} ${location.y} ${location.z} ${fillBlockName} ${fillData}`)

@@ -7,7 +7,7 @@ import * as utils from "./utils.js";
 let dim = utils.Factory.getDimension(0)
 
 function tellrawText(t: string, target: ("@s" | "@a" | "@e" | "@p" | "@r" | string) = "@a") {
-    dim.runCommand(`tellraw ${target} {"rawtext":[{"text":"${t}"}]}`)
+    dim.runCommand(`tellraw ${target} {"rawtext":[{"text":"${t.replace('"',"'")}"}]}`)
 }
 function tellrawTranslation(t: string, withList: string[] = null, target: ("@s" | "@a" | "@e" | "@p" | "@r" | string) = "@a") {
     if (withList === null) {
