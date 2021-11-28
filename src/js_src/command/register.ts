@@ -2,36 +2,42 @@ import { CommandResponse, RegisterCommand } from "../utils/register-command.js";
 import * as utils from '../utils/utils.js'
 import { WorldEditorCore } from "../core/core.js";
 
-export function registerCommand(core: WorldEditorCore) {
+export function registerCommand(core: Map<string, WorldEditorCore>) {
     let commands = [
         {
             command: 'set',
             running: function (e: CommandResponse) {
-                core.doSet(e.args[0], e.args[1], e.player)
+                core.get(e.player.nameTag).doSet(e)
             }
         },
         {
             command: 'copy',
             running: function (e: CommandResponse) {
-                core.copy()
+                core.get(e.player.nameTag).copy(e)
             }
         },
         {
             command: 'paste',
             running: function (e: CommandResponse) {
-                core.paste(e.player)
+                core.get(e.player.nameTag).paste(e)
             }
         },
         {
             command: 'redo',
             running: function (e: CommandResponse){
-                core.redo()
+                core.get(e.player.nameTag).redo(e)
             }
         },
         {
             command: 'undo',
             running: function (e: CommandResponse){
-                core.undo()
+                core.get(e.player.nameTag).undo(e)
+            }
+        },
+        {
+            command: 'replace',
+            running: function(e: CommandResponse){
+                core.get(e.player.nameTag).replace(e)
             }
         }
     ]

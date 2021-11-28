@@ -4,31 +4,37 @@ export function registerCommand(core) {
         {
             command: 'set',
             running: function (e) {
-                core.doSet(e.args[0], e.args[1], e.player);
+                core.get(e.player.nameTag).doSet(e);
             }
         },
         {
             command: 'copy',
             running: function (e) {
-                core.copy();
+                core.get(e.player.nameTag).copy(e);
             }
         },
         {
             command: 'paste',
             running: function (e) {
-                core.paste(e.player);
+                core.get(e.player.nameTag).paste(e);
             }
         },
         {
             command: 'redo',
             running: function (e) {
-                core.redo();
+                core.get(e.player.nameTag).redo(e);
             }
         },
         {
             command: 'undo',
             running: function (e) {
-                core.undo();
+                core.get(e.player.nameTag).undo(e);
+            }
+        },
+        {
+            command: 'replace',
+            running: function (e) {
+                core.get(e.player.nameTag).replace(e);
             }
         }
     ];

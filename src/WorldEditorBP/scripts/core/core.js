@@ -24,7 +24,7 @@ export class WorldEditorCore {
      * redo
      * 重做
      */
-    redo() {
+    redo(args) {
         if (this.futureStack.length > 0) {
             let i = this.futureStack.pop();
             if (i.redo()) {
@@ -43,7 +43,7 @@ export class WorldEditorCore {
      * undo
      * 撤销
      */
-    undo() {
+    undo(args) {
         if (this.historyStack.length > 0) {
             let i = this.historyStack.pop();
             if (i.undo()) {
@@ -71,7 +71,7 @@ export class WorldEditorCore {
     /**
      * copy
      */
-    copy() {
+    copy(args) {
         this.clipBoard = this.getAreaBlock();
     }
     /**
@@ -80,18 +80,18 @@ export class WorldEditorCore {
      * 粘贴后，从数组里取值
      * 开始点为玩家所在位置点，然后计算剪贴板内的每个方块和node1的差值，填充到玩家点附近的方块里
      */
-    paste(player) {
+    paste(args) {
         if (this.clipBoard.length == 0)
             return;
-        let op = new Operation(player.dimension);
-        let origin = utils.Converter.locationToBlockLocation(player.location);
+        let op = new Operation(args.player.dimension);
+        let origin = utils.Converter.locationToBlockLocation(args.player.location);
         // op.history = this.getAreaBlock(fillArea)
         this.clipBoard.forEach(i => {
             //计算本次循环的块和源点的偏移
             let x = i.x - this.node1.x;
             let y = i.y - this.node1.y;
             let z = i.z - this.node1.z;
-            let block = player.dimension.getBlock(origin.offset(x, y, z));
+            let block = args.player.dimension.getBlock(origin.offset(x, y, z));
             op.history.push(new BlockData(block));
             block.setPermutation(i.permutation);
             op.future.push(new BlockData(block));
@@ -100,20 +100,27 @@ export class WorldEditorCore {
         this.futureStack.length = 0;
     }
     /**
+     * replace
+     */
+    replace(args) {
+    }
+    /**
      * clearClipboard
      */
-    clearClipboard() {
+    clearClipboard(args) {
         this.clipBoard.length = 0;
     }
     /**
      * doSet
      * 填充某种方块
      */
-    doSet(blockName, data, player) {
+    doSet(args) {
         //将操作记录
         let op = new Operation(this.dimension);
         let err = 0;
         let ok = 0;
+        let blockName = args.args[0];
+        let data = args.args[1];
         try {
             this.area.forEach(i => {
                 try {
@@ -135,7 +142,6 @@ export class WorldEditorCore {
             utils.tellrawTranslation(tipText.doSet_fail);
         }
         if (err <= 0) {
-            utils.tellrawText(ok.toString());
             utils.tellrawTranslation(tipText.doSet_success, [ok.toString()]);
         }
         else {

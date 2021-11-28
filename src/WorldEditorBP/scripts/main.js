@@ -8,27 +8,32 @@ import { tipText } from "./texts/texts.js";
  * @author xxyz30
  * World Editor
  */
-const CORE = new WorldEditorCore();
+const CORE = new Map();
 const WORLD = mc.world;
 const DIMENSION = mc.Dimension;
 const EVENTS = WORLD.events;
-const SELECTED_NODE = [];
+const SELECTED_NODE = new Map();
 let open = true;
 registerCommand(CORE);
 EVENTS.beforeItemUseOn.subscribe(e => {
-    if (open && e.item.id === 'minecraft:wooden_axe') {
+    if (open && e.item.id === 'minecraft:wooden_axe' && e.source.id === 'minecraft:player') {
         e.cancel = true;
-        SELECTED_NODE.push(e.blockLocation);
-        if (SELECTED_NODE.length == 1) {
-            utils.tellrawText("再次点击选择第二个点");
+        let nodes = SELECTED_NODE.get(e.source.nameTag);
+        nodes.push(e.blockLocation);
+        if (nodes.length == 1) {
+            utils.tellrawTranslation(tipText.select_1);
         }
         else {
-            utils.tellrawText("选择完毕");
-            utils.tellrawText(`${[SELECTED_NODE[0].x, SELECTED_NODE[0].y, SELECTED_NODE[0].z]}`);
-            utils.tellrawText(`${[SELECTED_NODE[1].x, SELECTED_NODE[1].y, SELECTED_NODE[1].z]}`);
-            CORE.setArea(SELECTED_NODE[0], SELECTED_NODE[1], e.source.dimension);
-            SELECTED_NODE.length = 0;
+            utils.tellrawTranslation(tipText.select_2, [`${[nodes[0].x, nodes[0].y, nodes[0].z]}`, `${[nodes[1].x, nodes[1].y, nodes[1].z]}`]);
+            CORE.get(e.source.nameTag).setArea(nodes[0], nodes[1], e.source.dimension);
+            nodes.length = 0;
         }
+    }
+});
+EVENTS.playerJoin.subscribe(e => {
+    if (!CORE.has(e.player.nameTag)) {
+        CORE.set(e.player.nameTag, new WorldEditorCore());
+        SELECTED_NODE.set(e.player.nameTag, []);
     }
 });
 /**

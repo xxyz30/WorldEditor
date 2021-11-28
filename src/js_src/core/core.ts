@@ -4,6 +4,7 @@ import * as utils from '../utils/utils.js'
 import { tipText } from '../texts/texts.js'
 import { AreaMode } from "../core/precinct/area-mode.js";
 import { BlockData } from './block-data.js';
+import { CommandResponse } from '../utils/register-command';
 
 export class WorldEditorCore {
     //选取选取方式
@@ -31,7 +32,7 @@ export class WorldEditorCore {
      * redo
      * 重做
      */
-    public redo() {
+    public redo(args:CommandResponse) {
         if (this.futureStack.length > 0) {
             let i = this.futureStack.pop()
             if (i.redo()) {
@@ -49,7 +50,7 @@ export class WorldEditorCore {
      * undo
      * 撤销
      */
-    public undo() {
+    public undo(args:CommandResponse) {
         if (this.historyStack.length > 0) {
             let i = this.historyStack.pop()
             if (i.undo()) {
@@ -77,7 +78,7 @@ export class WorldEditorCore {
     /**
      * copy
      */
-    public copy() {
+    public copy(args:CommandResponse) {
         this.clipBoard = this.getAreaBlock()
     }
 
@@ -87,10 +88,10 @@ export class WorldEditorCore {
      * 粘贴后，从数组里取值
      * 开始点为玩家所在位置点，然后计算剪贴板内的每个方块和node1的差值，填充到玩家点附近的方块里
      */
-    public paste(player: mc.Player) {
+    public paste(args:CommandResponse) {
         if (this.clipBoard.length == 0) return
-        let op = new Operation(player.dimension)
-        let origin = utils.Converter.locationToBlockLocation(player.location)
+        let op = new Operation(args.player.dimension)
+        let origin = utils.Converter.locationToBlockLocation(args.player.location)
 
         // op.history = this.getAreaBlock(fillArea)
 
@@ -99,7 +100,7 @@ export class WorldEditorCore {
             let x = i.x - this.node1.x
             let y = i.y - this.node1.y
             let z = i.z - this.node1.z
-            let block = player.dimension.getBlock(origin.offset(x, y, z))
+            let block = args.player.dimension.getBlock(origin.offset(x, y, z))
             op.history.push(new BlockData(block))
             block.setPermutation(i.permutation)
             op.future.push(new BlockData(block))
@@ -108,21 +109,29 @@ export class WorldEditorCore {
         this.futureStack.length = 0
     }
     /**
+     * replace
+     */
+    public replace(args:CommandResponse){
+        
+    }
+    /**
      * clearClipboard
      */
-    public clearClipboard() {
+    public clearClipboard(args:CommandResponse) {
         this.clipBoard.length = 0
     }
     /**
      * doSet
      * 填充某种方块
      */
-    public doSet(blockName: string, data: number | string, player: mc.Player) {
+    public doSet(args:CommandResponse) {
         //将操作记录
         let op = new Operation(this.dimension)
 
         let err: number = 0
         let ok: number = 0
+        let blockName = args.args[0]
+        let data = args.args[1]
         try {
             this.area.forEach(i => {
                 try {

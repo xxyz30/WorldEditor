@@ -1,20 +1,22 @@
 pack.name=创世神模组
 pack.description=创世神模组
 
+select.1=再次点击选择第二个点
+select.2=选择完毕:从[§2%s]§r到§2[%s]
 
-world_editor.open=开启
-world_editor.close=关闭
-world_editor.command_format_fail=命令格式不正确
+world_editor.open=§2开启
+world_editor.close=§3关闭
+world_editor.command_format_fail=§4命令格式不正确
 
-world_editor.switch_state=状态：%%s
-world_editor.switch_state.open=选择状态已开启
-world_editor.switch_state.close=选择状态已关闭
+world_editor.switch_state=状态：%s
+world_editor.switch_state.open=§2选择状态已开启
+world_editor.switch_state.close=§3选择状态已关闭
 
-redo.success=重做成功
-redo.fail=重做失败
-undo.success=撤销成功
-undo.fail=撤销失败
+redo.success=§2重做成功
+redo.fail=§4重做失败
+undo.success=§2撤销成功
+undo.fail=§4撤销失败
 
-doSet.success=成功填充了%s个方块
+doSet.success=成功填充了§2[%s]§r个方块
 doSet.fail=填充失败
-doSet.success.some=成功填充了%s个方块，失败了%s个方块
+doSet.success.some=成功填充了§2[%s]§r个方块，失败了§4[%s]§r个方块

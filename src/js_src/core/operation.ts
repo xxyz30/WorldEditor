@@ -28,9 +28,7 @@ export class Operation {
      * undo
      */
     public undo(): boolean {
-        utils.tellrawText("运行重做")
         this.history.forEach(block => {
-            utils.tellrawText(block.id)
             let b: mc.Block = this.dimension.getBlock(block.location)
             b.setPermutation(block.permutation)
         })

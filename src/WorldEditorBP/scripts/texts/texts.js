@@ -1,4 +1,6 @@
 export let tipText = {
+    select_1: "select.1",
+    select_2: "select.2",
     open: "world_editor.open",
     close: "world_editor.close",
     command_format_fail: "world_editor.command_format_fail",
