@@ -5,6 +5,7 @@ import { tipText } from '../texts/texts.js'
 import { AreaMode } from "../core/precinct/area-mode.js";
 import { BlockData } from './block-data.js';
 import { CommandResponse } from '../utils/register-command';
+import * as Bus from './bus/data-bus.js'
 
 export class WorldEditorCore {
     //选取选取方式
@@ -28,7 +29,7 @@ export class WorldEditorCore {
      * redo
      * 重做
      */
-    public redo(args:CommandResponse) {
+    public redo(args: CommandResponse) {
         if (this.futureStack.length > 0) {
             let i = this.futureStack.pop()
             if (i.redo()) {
@@ -46,7 +47,7 @@ export class WorldEditorCore {
      * undo
      * 撤销
      */
-    public undo(args:CommandResponse) {
+    public undo(args: CommandResponse) {
         if (this.historyStack.length > 0) {
             let i = this.historyStack.pop()
             if (i.undo()) {
@@ -74,7 +75,7 @@ export class WorldEditorCore {
     /**
      * copy
      */
-    public copy(args:CommandResponse) {
+    public copy(args: CommandResponse) {
         this.clipBoard = this.getAreaBlock()
         utils.tellrawTranslation(tipText.copy_success)
     }
@@ -85,7 +86,7 @@ export class WorldEditorCore {
      * 粘贴后，从数组里取值
      * 开始点为玩家所在位置点，然后计算剪贴板内的每个方块和node1的差值，填充到玩家点附近的方块里
      */
-    public paste(args:CommandResponse) {
+    public paste(args: CommandResponse) {
         if (this.clipBoard.length == 0) return
         let op = new Operation(args.player.dimension)
         let origin = utils.Converter.locationToBlockLocation(args.player.location)
@@ -109,8 +110,8 @@ export class WorldEditorCore {
     /**
      * replace
      */
-    public replace(args:CommandResponse){
-        if(args.args.length === 0){
+    public replace(args: CommandResponse) {
+        if (args.args.length === 0) {
             utils.tellrawTranslation(tipText.replace_fail)
             return
         }
@@ -120,7 +121,7 @@ export class WorldEditorCore {
         let replacedBlock = args.args[2]
         let replacedData = args.args[3]
 
-        this.area.forEach(i =>{
+        this.area.forEach(i => {
             op.history.push(new BlockData(this.dimension.getBlock(i)))
             utils.Commands.fillBlockById(this.dimension, i, replaceBlock, replaceData, replacedBlock, replacedData)
             op.future.push(new BlockData(this.dimension.getBlock(i)))
@@ -134,45 +135,44 @@ export class WorldEditorCore {
     /**
      * clearClipboard
      */
-    public clearClipboard(args:CommandResponse) {
+    public clearClipboard(args: CommandResponse) {
         this.clipBoard.length = 0
     }
     /**
      * doSet
      * 填充某种方块
      */
-    public doSet(args:CommandResponse) {
+    public doSet(args: CommandResponse) {
         //将操作记录
         let op = new Operation(this.dimension)
-
-        let err: number = 0
-        let ok: number = 0
         let blockName = args.args[0]
         let data = args.args[1]
-        try {
-            this.area.forEach(i => {
-                try {
-                    //修改前的方块压进去
-                    op.history.push(new BlockData(this.dimension.getBlock(i)))
-                    utils.Commands.setBlockById(this.dimension, blockName, i, data)
-                    ok++
-                    //将修改的方块压进去
-                    op.future.push(new BlockData(this.dimension.getBlock(i)))
-                } catch (ex) {
-                    if (ex.statusCode == -2147483648) throw ex
-                    err++
-                }
-            });
-        } catch (ex) {
-            utils.tellrawTranslation(tipText.doSet_fail)
-        }
-        if (err <= 0) {
-            utils.tellrawTranslation(tipText.doSet_success, [ok.toString()])
-        } else {
-            utils.tellrawTranslation(tipText.doSet_some_success, [ok.toString(), err.toString()])
-        }
+        let futureData = BlockData.getBlockById(blockName, data, args.player)
+        // try {
+        this.area.forEach(i => {
+            try {
+                //修改前的方块压进去
+                op.history.push(new BlockData(this.dimension.getBlock(i)))
+                //将修改的方块压进去
+                op.future.push(futureData)
+                // utils.tellrawText(BlockData.getBlockById(blockName, data, args.player).toSting())
+            } catch (ex) {
+                console.log(ex);
+                // if (ex.statusCode == -2147483648) throw ex
+            }
+        });
         this.futureStack.length = 0
         this.historyStack.push(op)
+        Bus.addOperation(op, (data => {
+            if (data.success) {
+                utils.tellrawTranslation(tipText.doSet_success, [data.successTimes.toString()])
+            }else{
+                utils.tellrawTranslation(tipText.doSet_fail, [data.failTimes.toString()])
+            }
+        }))
+        // } catch (ex) {
+        //     utils.tellrawTranslation(tipText.doSet_fail)
+        // }
     }
 
     /**

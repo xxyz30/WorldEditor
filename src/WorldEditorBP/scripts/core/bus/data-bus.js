@@ -1,4 +1,5 @@
 import * as utils from '../../utils/utils.js';
+import { BusCallBackData } from './bus-callback.js';
 /**
  * do the thing every tick
  * 添加一个新操作，放到数组队列里，然后每个tick执行一个小操作
@@ -9,28 +10,29 @@ import * as utils from '../../utils/utils.js';
 /**
  * 每个Tick最多执行多少个方块
  */
-let maxBlockEveryTick = 1000;
+let maxBlockEveryTick = 300;
 //需要进行操作的队列
 let operationQueue = [];
 //完成后进行的callback操作
 let finishedCallbackQueue = [];
 //目前进度的操作
-let currentProgress;
+let currentProgress = null;
 //目前操作已经完成的方块数量
 let currentBlockCount = 0;
 /**
  * 添加一个新操作
  */
-export function addOperation(op, callback) {
+function addOperation(op, callback) {
     operationQueue.push(op);
     finishedCallbackQueue.push(callback);
 }
 utils.Factory.getEvents().tick.subscribe(e => {
-    if (operationQueue.length <= 0 || currentProgress === null)
+    if (operationQueue.length <= 0 && currentProgress === null)
         return;
+    // console.log("还有任务");
     //有东西
     //如果目前的进度已经完成，则
-    if (currentProgress !== null)
+    if (currentProgress === null)
         currentProgress = operationQueue.shift();
     //取这个操作的currentBlockCount到currentBlockCount + maxBlockEveryTick范围的对象
     let handelHistoryList = currentProgress.history.slice(currentBlockCount, currentBlockCount + maxBlockEveryTick);
@@ -43,7 +45,13 @@ utils.Factory.getEvents().tick.subscribe(e => {
         currentBlockCount += maxBlockEveryTick;
     }
     else {
+        // console.log("任务完成");
+        // console.log(currentProgress.history.length);
+        // console.log(currentProgress.history.length);
+        // console.log(currentBlockCount);
         currentBlockCount = 0;
-        finishedCallbackQueue.shift()();
+        finishedCallbackQueue.shift()({ success: true, op: currentProgress, successTims: currentProgress.future.length });
+        currentProgress = null;
     }
 });
+export { addOperation, BusCallBackData };

@@ -4,6 +4,7 @@ import * as utils from '../utils/utils.js';
 import { tipText } from '../texts/texts.js';
 import { AreaMode } from "../core/precinct/area-mode.js";
 import { BlockData } from './block-data.js';
+import * as Bus from './bus/data-bus.js';
 export class WorldEditorCore {
     constructor() {
         //选取选取方式
@@ -134,38 +135,36 @@ export class WorldEditorCore {
     doSet(args) {
         //将操作记录
         let op = new Operation(this.dimension);
-        let err = 0;
-        let ok = 0;
         let blockName = args.args[0];
         let data = args.args[1];
-        try {
-            this.area.forEach(i => {
-                try {
-                    //修改前的方块压进去
-                    op.history.push(new BlockData(this.dimension.getBlock(i)));
-                    utils.Commands.setBlockById(this.dimension, blockName, i, data);
-                    ok++;
-                    //将修改的方块压进去
-                    op.future.push(new BlockData(this.dimension.getBlock(i)));
-                }
-                catch (ex) {
-                    if (ex.statusCode == -2147483648)
-                        throw ex;
-                    err++;
-                }
-            });
-        }
-        catch (ex) {
-            utils.tellrawTranslation(tipText.doSet_fail);
-        }
-        if (err <= 0) {
-            utils.tellrawTranslation(tipText.doSet_success, [ok.toString()]);
-        }
-        else {
-            utils.tellrawTranslation(tipText.doSet_some_success, [ok.toString(), err.toString()]);
-        }
+        let futureData = BlockData.getBlockById(blockName, data, args.player);
+        // try {
+        this.area.forEach(i => {
+            try {
+                //修改前的方块压进去
+                op.history.push(new BlockData(this.dimension.getBlock(i)));
+                //将修改的方块压进去
+                op.future.push(futureData);
+                // utils.tellrawText(BlockData.getBlockById(blockName, data, args.player).toSting())
+            }
+            catch (ex) {
+                console.log(ex);
+                // if (ex.statusCode == -2147483648) throw ex
+            }
+        });
         this.futureStack.length = 0;
         this.historyStack.push(op);
+        Bus.addOperation(op, (data => {
+            if (data.success) {
+                utils.tellrawTranslation(tipText.doSet_success, [data.successTimes.toString()]);
+            }
+            else {
+                utils.tellrawTranslation(tipText.doSet_fail, [data.failTimes.toString()]);
+            }
+        }));
+        // } catch (ex) {
+        //     utils.tellrawTranslation(tipText.doSet_fail)
+        // }
     }
     /**
      * getSize

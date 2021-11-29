@@ -14,39 +14,46 @@ import { BusCallBackData } from './bus-callback.js';
 /**
  * 每个Tick最多执行多少个方块
  */
-let maxBlockEveryTick = 1000
+let maxBlockEveryTick = 300
 //需要进行操作的队列
-let operationQueue:Operation[] = []
+let operationQueue: Operation[] = []
 //完成后进行的callback操作
-let finishedCallbackQueue:Function[] = []
+let finishedCallbackQueue: Function[] = []
 //目前进度的操作
-let currentProgress:Operation
+let currentProgress: Operation = null
 //目前操作已经完成的方块数量
 let currentBlockCount: number = 0
 /**
  * 添加一个新操作
  */
-export function addOperation(op: Operation, callback:(op:BusCallBackData) => void) {
+function addOperation(op: Operation, callback: (data: BusCallBackData) => void) {
     operationQueue.push(op)
     finishedCallbackQueue.push(callback)
 }
 
 utils.Factory.getEvents().tick.subscribe(e => {
-    if(operationQueue.length <= 0 || currentProgress === null) return
+    if (operationQueue.length <= 0 && currentProgress === null) return
+    // console.log("还有任务");
     //有东西
     //如果目前的进度已经完成，则
-    if(currentProgress !== null) currentProgress = operationQueue.shift()
+    if (currentProgress === null) currentProgress = operationQueue.shift()
     //取这个操作的currentBlockCount到currentBlockCount + maxBlockEveryTick范围的对象
-    let handelHistoryList = currentProgress.history.slice(currentBlockCount,currentBlockCount + maxBlockEveryTick)
-    let handelFutureList = currentProgress.future.slice(currentBlockCount,currentBlockCount + maxBlockEveryTick)
-    handelHistoryList.forEach((item, i) =>{
+    let handelHistoryList = currentProgress.history.slice(currentBlockCount, currentBlockCount + maxBlockEveryTick)
+    let handelFutureList = currentProgress.future.slice(currentBlockCount, currentBlockCount + maxBlockEveryTick)
+    handelHistoryList.forEach((item, i) => {
         item.block.setPermutation(handelFutureList[i].permutation)
     })
-    if(currentProgress.history.length - currentBlockCount > 0) {
+    if (currentProgress.history.length - currentBlockCount > 0) {
         //若是剩余还有，则处理完成这max个，否则是这次就做完了，变成0，并callback
         currentBlockCount += maxBlockEveryTick
-    }else{
+    } else {
+        // console.log("任务完成");
+        // console.log(currentProgress.history.length);
+        // console.log(currentProgress.history.length);
+        // console.log(currentBlockCount);
         currentBlockCount = 0
-        finishedCallbackQueue.shift()()
+        finishedCallbackQueue.shift()({ success: true, op: currentProgress, successTims: currentProgress.future.length })
+        currentProgress = null
     }
 })
+export { addOperation, BusCallBackData }
