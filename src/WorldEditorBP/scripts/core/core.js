@@ -104,7 +104,6 @@ export class WorldEditorCore {
     replace(args) {
         if (args.args.length === 0) {
             utils.tellrawTranslation(tipText.replace_fail);
-            utils.tellrawText("参数为0");
             return;
         }
         let op = new Operation(this.dimension);

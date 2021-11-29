@@ -4,6 +4,7 @@ import * as utils from './utils/utils.js';
 import { WorldEditorCore } from "./core/core.js";
 import { registerCommand } from "./command/register.js";
 import { tipText } from "./texts/texts.js";
+import { BlockLocation } from 'mojang-minecraft';
 /**
  * @author xxyz30
  * World Editor
@@ -57,4 +58,7 @@ RegisterCommand.register('precinct', data => {
             utils.tellrawTranslation(tipText.command_format_fail);
         }
     }
+});
+EVENTS.beforeChat.subscribe((e) => {
+    e.sender.dimension.getBlock(new BlockLocation(0, -60, 0)).setPermutation(mc.MinecraftBlockTypes.get(e.message).createDefaultBlockPermutation());
 });

@@ -4,6 +4,7 @@ import * as utils from './utils/utils.js';
 import { WorldEditorCore } from "./core/core.js";
 import { registerCommand } from "./command/register.js";
 import { tipText } from "./texts/texts.js"
+import { BlockLocation } from 'mojang-minecraft';
 /**
  * @author xxyz30
  * World Editor 
@@ -28,14 +29,14 @@ EVENTS.beforeItemUseOn.subscribe(e => {
         if (nodes.length == 1) {
             utils.tellrawTranslation(tipText.select_1)
         } else {
-            utils.tellrawTranslation(tipText.select_2, [`${[nodes[0].x, nodes[0].y, nodes[0].z]}`,`${[nodes[1].x, nodes[1].y, nodes[1].z]}`])
+            utils.tellrawTranslation(tipText.select_2, [`${[nodes[0].x, nodes[0].y, nodes[0].z]}`, `${[nodes[1].x, nodes[1].y, nodes[1].z]}`])
             CORE.get(e.source.nameTag).setArea(nodes[0], nodes[1], e.source.dimension)
             nodes.length = 0
         }
     }
 })
 EVENTS.playerJoin.subscribe(e => {
-    if(!CORE.has(e.player.nameTag)){
+    if (!CORE.has(e.player.nameTag)) {
         CORE.set(e.player.nameTag, new WorldEditorCore())
         SELECTED_NODE.set(e.player.nameTag, [])
     }
