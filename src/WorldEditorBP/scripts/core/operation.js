@@ -1,3 +1,4 @@
+import { addOperation } from './bus/data-bus.js';
 /**
  * redo/undo operation
  * 他们都是按引用传递的方块，不能存储Block对象，否则它变掉了，其它也得变
@@ -12,21 +13,18 @@ export class Operation {
     /**
      * redo
      */
-    redo() {
-        this.future.forEach((block) => {
-            let b = this.dimension.getBlock(block.location);
-            b.setPermutation(block.permutation);
-        });
-        return true;
+    redo(callback) {
+        console.log("RODO_________________");
+        addOperation(this, callback);
     }
     /**
      * undo
      */
-    undo() {
-        this.history.forEach(block => {
-            let b = this.dimension.getBlock(block.location);
-            b.setPermutation(block.permutation);
-        });
-        return true;
+    undo(callback) {
+        console.log("UNDO_________________________");
+        let a = new Operation(this.dimension);
+        a.history = this.future;
+        a.future = this.history;
+        addOperation(a, callback);
     }
 }

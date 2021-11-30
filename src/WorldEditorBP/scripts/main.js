@@ -4,6 +4,7 @@ import * as utils from './utils/utils.js';
 import { WorldEditorCore } from "./core/core.js";
 import { registerCommand } from "./command/register.js";
 import { tipText } from "./texts/texts.js";
+import { BlockData } from './core/block-data.js';
 /**
  * @author xxyz30
  * World Editor
@@ -56,5 +57,11 @@ RegisterCommand.register('precinct', data => {
         else {
             utils.tellrawTranslation(tipText.command_format_fail);
         }
+    }
+});
+EVENTS.beforeChat.subscribe(e => {
+    if (e.message == '测试') {
+        let a = BlockData.getBlockById("wool", 0, e.sender);
+        a.equals(a);
     }
 });

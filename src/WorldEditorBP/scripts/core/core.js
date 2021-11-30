@@ -25,13 +25,15 @@ export class WorldEditorCore {
     redo(args) {
         if (this.futureStack.length > 0) {
             let i = this.futureStack.pop();
-            if (i.redo()) {
-                utils.tellrawTranslation(tipText.redo_success);
-                this.historyStack.push(i);
-            }
-            else {
-                utils.tellrawTranslation(tipText.redo_fail);
-            }
+            i.redo(data => {
+                if (data.success) {
+                    this.historyStack.push(i);
+                    utils.tellrawTranslation(tipText.redo_success);
+                }
+                else {
+                    utils.tellrawTranslation(tipText.redo_fail);
+                }
+            });
         }
         else {
             utils.tellrawTranslation(tipText.redo_fail);
@@ -44,13 +46,15 @@ export class WorldEditorCore {
     undo(args) {
         if (this.historyStack.length > 0) {
             let i = this.historyStack.pop();
-            if (i.undo()) {
-                utils.tellrawTranslation(tipText.undo_success);
-                this.futureStack.push(i);
-            }
-            else {
-                utils.tellrawTranslation(tipText.undo_fail);
-            }
+            i.undo(data => {
+                if (data.success) {
+                    this.futureStack.push(i);
+                    utils.tellrawTranslation(tipText.undo_success);
+                }
+                else {
+                    utils.tellrawTranslation(tipText.undo_fail);
+                }
+            });
         }
         else {
             utils.tellrawTranslation(tipText.undo_fail);
@@ -92,12 +96,21 @@ export class WorldEditorCore {
             let z = i.location.z - this.node1.z;
             let block = args.player.dimension.getBlock(origin.offset(x, y, z));
             op.history.push(new BlockData(block));
-            block.setPermutation(i.permutation);
-            op.future.push(new BlockData(block));
+            // block.setPermutation(i.permutation)
+            let feture = new BlockData(block);
+            feture.permutation = i.permutation.clone();
+            op.future.push(feture);
         });
-        this.historyStack.push(op);
-        this.futureStack.length = 0;
-        utils.tellrawTranslation(tipText.paste_success);
+        Bus.addOperation(op, (data => {
+            if (data.success) {
+                this.historyStack.push(op);
+                this.futureStack.length = 0;
+                utils.tellrawTranslation(tipText.paste_success);
+            }
+            else {
+                utils.tellrawTranslation(tipText.paste_fail);
+            }
+        }));
     }
     /**
      * replace
@@ -110,11 +123,17 @@ export class WorldEditorCore {
         let op = new Operation(this.dimension);
         let replaceBlock = args.args[0];
         let replaceData = args.args[1];
-        let replacedBlock = args.args[2];
-        let replacedData = args.args[3];
+        let replacedBlock = utils.Converter.isNullOrUndefined(args.args[2], 'air');
+        let replacedData = utils.Converter.isNullOrUndefined(args.args[3], '0');
+        //需要填充的方块实例
+        let replaceBlockInstance = BlockData.getBlockById(replaceBlock, replaceData, args.player);
+        //被填充的方块实例
+        let replacedBlockInstance = BlockData.getBlockById(replacedBlock, replacedData, args.player);
+        //对比放置
+        //TODO
         this.area.forEach(i => {
             op.history.push(new BlockData(this.dimension.getBlock(i)));
-            utils.Commands.fillBlockById(this.dimension, i, replaceBlock, replaceData, replacedBlock, replacedData);
+            // utils.Commands.fillBlockById(this.dimension, i, replaceBlock, replaceData, replacedBlock, replacedData)
             op.future.push(new BlockData(this.dimension.getBlock(i)));
         });
         //TODO
@@ -144,7 +163,11 @@ export class WorldEditorCore {
                 //修改前的方块压进去
                 op.history.push(new BlockData(this.dimension.getBlock(i)));
                 //将修改的方块压进去
-                op.future.push(futureData);
+                //TODO：这里会导致撤销出事情（应该是跑到y=0的地方撤销方块了，因为futureBlock是在玩家的xz和y=0的地方得到的）.
+                //这里必须存储真实的DATA
+                let futureBlock = new BlockData(this.dimension.getBlock(i));
+                futureBlock.permutation = futureData.permutation.clone();
+                op.future.push(futureBlock);
                 // utils.tellrawText(BlockData.getBlockById(blockName, data, args.player).toSting())
             }
             catch (ex) {
@@ -152,10 +175,10 @@ export class WorldEditorCore {
                 // if (ex.statusCode == -2147483648) throw ex
             }
         });
-        this.futureStack.length = 0;
-        this.historyStack.push(op);
         Bus.addOperation(op, (data => {
             if (data.success) {
+                this.futureStack.length = 0;
+                this.historyStack.push(op);
                 utils.tellrawTranslation(tipText.doSet_success, [data.successTimes.toString()]);
             }
             else {

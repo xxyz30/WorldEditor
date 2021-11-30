@@ -1,8 +1,8 @@
 import { Location, BlockLocation, Block } from 'mojang-minecraft'
-function blockLocationToLocation(l: BlockLocation): Location {
+export function blockLocationToLocation(l: BlockLocation): Location {
     return new Location(l.x, l.y, l.z)
 }
-function locationToBlockLocation(l: Location): BlockLocation {
+export function locationToBlockLocation(l: Location): BlockLocation {
     return new BlockLocation(Math.floor(l.x), Math.floor(l.y), Math.floor(l.z))
 }
 /**
@@ -10,11 +10,17 @@ function locationToBlockLocation(l: Location): BlockLocation {
  * namespace:name -> namespace:name
  * @param name name
  */
-function namespaceFormat(name: string): string {
+export function namespaceFormat(name: string): string {
     if (name.split(":").length >= 2) {
         return name
     }else{
         return 'minecraft:' + name
     }
 }
-export { blockLocationToLocation, locationToBlockLocation, namespaceFormat }
+export function isNullOrUndefined<T, V>(testObject:T, ifNullOrUndefinedReturnObject:V):(T | V){
+    if(testObject == null){
+        return ifNullOrUndefinedReturnObject
+    }else{
+        return testObject
+    }
+}

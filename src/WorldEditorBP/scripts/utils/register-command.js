@@ -7,7 +7,7 @@ export class RegisterCommand {
             if (!e.message.startsWith(this.startChar + params))
                 return;
             e.cancel = true;
-            let args = e.message.split(' ').slice(1);
+            let args = e.message.trim().split(' ').slice(1);
             callBack(new CommandResponse(e.sender, args));
         });
     }

@@ -1,5 +1,5 @@
 import { Operation } from '../operation';
-import { Events, World, world } from 'mojang-minecraft';
+import { Events, MinecraftBlockTypes, World, world } from 'mojang-minecraft';
 import * as utils from '../../utils/utils.js';
 import { BusCallBackData } from './bus-callback.js';
 
@@ -40,19 +40,29 @@ utils.Factory.getEvents().tick.subscribe(e => {
     //取这个操作的currentBlockCount到currentBlockCount + maxBlockEveryTick范围的对象
     let handelHistoryList = currentProgress.history.slice(currentBlockCount, currentBlockCount + maxBlockEveryTick)
     let handelFutureList = currentProgress.future.slice(currentBlockCount, currentBlockCount + maxBlockEveryTick)
+    console.log("future");
+    console.log(JSON.stringify(handelFutureList));
+    console.log(handelFutureList[0].block.id);
+    console.log("history");
+    console.log(JSON.stringify(handelHistoryList));
+    console.log(handelHistoryList[0].block.permutation);
     handelHistoryList.forEach((item, i) => {
         item.block.setPermutation(handelFutureList[i].permutation)
+        // item.block.setPermutation(MinecraftBlockTypes.wool.createDefaultBlockPermutation())
     })
-    if (currentProgress.history.length - currentBlockCount > 0) {
-        //若是剩余还有，则处理完成这max个，否则是这次就做完了，变成0，并callback
-        currentBlockCount += maxBlockEveryTick
-    } else {
-        // console.log("任务完成");
+    currentBlockCount += maxBlockEveryTick
+    if (currentProgress.history.length - currentBlockCount <= 0) {
+        console.log("任务完成");
         // console.log(currentProgress.history.length);
         // console.log(currentProgress.history.length);
         // console.log(currentBlockCount);
         currentBlockCount = 0
-        finishedCallbackQueue.shift()({ success: true, op: currentProgress, successTims: currentProgress.future.length })
+        try {
+            finishedCallbackQueue.shift()({ success: true, op: currentProgress, successTimes: currentProgress.future.length })
+        }
+        catch(ex){
+            console.log(ex);
+        }
         currentProgress = null
     }
 })

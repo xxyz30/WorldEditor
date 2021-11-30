@@ -14,7 +14,7 @@ export class RegisterCommand {
         Factory.getEvents().beforeChat.subscribe(e => {
             if (!e.message.startsWith(this.startChar + params)) return
             e.cancel = true
-            let args: string[] = e.message.split(' ').slice(1)
+            let args: string[] = e.message.trim().split(' ').slice(1)
             callBack(new CommandResponse(e.sender, args))
         })
     }

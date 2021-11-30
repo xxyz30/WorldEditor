@@ -12,6 +12,12 @@ export class BlockData {
         this.permutation = block.permutation.clone();
         this.block = block;
     }
+    equals(block) {
+        // console.log(JSON.stringify(this.permutation.getAllProperties()))
+        // console.log(JSON.stringify(block.permutation.getAllProperties()))
+        let l = block.permutation.getProperty("colors");
+        console.log(JSON.stringify(l));
+    }
     /**
      * 用于从ID获得BlockData的实例
      */
